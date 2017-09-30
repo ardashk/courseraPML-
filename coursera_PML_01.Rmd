@@ -1,0 +1,150 @@
+---
+title: "Coursera Practical Machine Learning"
+output: html_notebook
+---
+
+#Initialize
+```{r}
+rm(list=ls())
+library(caTools)
+library(LiblineaR)
+library(caret)
+library(kernlab)
+library(C50)
+library(ISLR)
+library(ggplot2)
+library(Hmisc)
+library(gridExtra)
+library(nnet)
+library(splines)
+library(AppliedPredictiveModeling)
+library(rattle)
+library(ElemStatLearn)
+library(pgmm)
+library(lubridate)
+library(elasticnet)
+library(forecast)
+library(e1071)
+library(LogicReg)
+```
+
+#Read Data
+
+```{r}
+rawData <- read.csv('c:/users/ardash/google drive/data/education/coursera ml/caret/pml-training.csv')
+
+# pca <- preProcess(rawData[,names(rawData)!='classe'])
+# pca$std[order(pca$std,decreasing=T)]
+
+```
+
+
+#Clean and Pre-Process Data
+Remove columns believed to be unnecessary (timestamp, row names)
+```{r}
+rawData <- rawData[,-c(1:7)]
+```
+Find gaps in data (a lot of missing values)
+```{r}
+gaps <- data.frame(colSums(1*(rawData=='' | is.na(rawData) | rawData=='#DIV/0!')))
+colnames(gaps) <- 'non_null'
+table(gaps)
+
+```
+There are only 53 columns with complete data.  The rest are mostly blanks, NAs or DIV/0!.  May not have predictive value.
+Store column names with gaps to remove from both training and test sets
+Remove gapped columns from training set
+```{r}
+gapped_names <- as.list(rownames(gaps[gaps$non_null>19000,0]))
+procData <- rawData[,!colnames(rawData)%in%gapped_names]
+# featureClasses <- lapply(procData,class)
+# num_features_idx = which(lapply(procData,class) %in% c("numeric"))
+
+
+
+
+# summary(procData)
+```
+Split to Training and Cross Validation Sets
+```{r}
+
+# procData <- predict(preProc,newdata=procData)
+set.seed(3523)
+yName <- 'classe'
+colnames(procData)[match(yName,colnames(procData))] <- 'Y'
+indexTrain <- createDataPartition(procData$Y,p=.75,list=F)
+trainSet <- procData[indexTrain,]
+crossvSet <- procData[-indexTrain,]
+
+centScale <- preProcess(trainSet,method=c('center','scale'))
+trainSet <- predict(centScale,newdata=trainSet)
+crossvSet <- predict(centScale,newdata=crossvSet)
+procData <- predict(centScale,newdata=procData)
+
+# pca <- preProcess(trainSet[,colnames(trainSet)!='Y'],method='pca')
+# pca$std
+
+
+# i <- 30
+# featurePlot(trainSet[,i],trainSet$Y)
+
+
+```
+
+
+
+
+#Train Model
+```{r}
+# glm, nnet, rpart, rf, gbm, lda
+modelFitRF <- train(Y~.,data=trainSet,method='rf',prox=T)
+modelFitRLR <- train(Y~.,data=trainSet,method='LogitBoost')
+modelFitLDA <- train(Y~.,data=trainSet,method='lda')
+
+modelFitRPART <- train(Y~.,data=trainSet,method='rpart')
+modelFitGLM <- train(Y~.,data=trainSet,method='glm',family='multinomial')
+
+modelFitNNET <- train(Y~.,data=trainSet,method='nnet')
+
+modelFitGBM <- train(Y~.,data=trainSet,method='gbm',verbose=FALSE)
+
+
+
+modelFitLDA
+modelFitRPART
+modelFitGBM
+modelFitNNET
+
+
+getTree(modelFitRPART$finalModel,k=2)
+
+modelFit_stack <- train(Y~.,data=temp,method='rf',prox=T)
+modelFit <- svm(Y~.,data=trainSet)
+modelFit$coefs
+
+predictions <- predict(modelFitLDA,newdata=crossvSet)
+predictions <- predict(modelFitRPART,newdata=trainSet)
+
+cm <- t(table(predictions,crossvSet$Y))
+cm <- t(table(predictions,trainSet$Y))
+round(cm/rowSums(cm),2)
+
+confusionMatrix(predictions,crossvSet$Y)/
+
+confusionMatrix(predictionsRF,testSet$Y)
+confusionMatrix(predictionsGBM,testSet$Y)
+confusionMatrix(predictionsStack,testSet$Y)
+confusionMatrix(round(predictions),trainSet$Y)
+
+
+confusionMatrix(temp$RF,temp$Y)
+
+table(predictions,testSet$Y)
+
+
+
+
+
+
+
+```
