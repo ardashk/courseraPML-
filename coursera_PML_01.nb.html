@@ -176,13 +176,30 @@ $(document).ready(function () {
 <h1>Initialize</h1>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShjYVRvb2xzKVxuXG5gYGAifQ== -->
-<pre class="r"><code>library(caTools)
-</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucm0obGlzdD1scygpKVxubGlicmFyeShjYVRvb2xzKVxubGlicmFyeShMaWJsaW5lYVIpXG5saWJyYXJ5KGNhcmV0KVxubGlicmFyeShrZXJubGFiKVxubGlicmFyeShDNTApXG5saWJyYXJ5KElTTFIpXG5saWJyYXJ5KGdncGxvdDIpXG5saWJyYXJ5KEhtaXNjKVxubGlicmFyeShncmlkRXh0cmEpXG5saWJyYXJ5KG5uZXQpXG5saWJyYXJ5KHNwbGluZXMpXG5saWJyYXJ5KEFwcGxpZWRQcmVkaWN0aXZlTW9kZWxpbmcpXG5saWJyYXJ5KHJhdHRsZSlcbmxpYnJhcnkoRWxlbVN0YXRMZWFybilcbmxpYnJhcnkocGdtbSlcbmxpYnJhcnkobHVicmlkYXRlKVxubGlicmFyeShlbGFzdGljbmV0KVxubGlicmFyeShmb3JlY2FzdClcbmxpYnJhcnkoZTEwNzEpXG5saWJyYXJ5KExvZ2ljUmVnKVxubGlicmFyeShyYW5kb21Gb3Jlc3QpXG5gYGAifQ== -->
+<pre class="r"><code>rm(list=ls())
+library(caTools)
+library(LiblineaR)
+library(caret)
+library(kernlab)
+library(C50)
+library(ISLR)
+library(ggplot2)
+library(Hmisc)
+library(gridExtra)
+library(nnet)
+library(splines)
+library(AppliedPredictiveModeling)
+library(rattle)
+library(ElemStatLearn)
+library(pgmm)
+library(lubridate)
+library(elasticnet)
+library(forecast)
+library(e1071)
+library(LogicReg)
+library(randomForest)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoicGFja2FnZSDjpLzjuLFjYVRvb2xz46S847iyIHdhcyBidWlsdCB1bmRlciBSIHZlcnNpb24gMy4zLjNcbiJ9 -->
-<pre><code>package &lt;U+393C&gt;&lt;U+3E31&gt;caTools&lt;U+393C&gt;&lt;U+3E32&gt; was built under R version 3.3.3</code></pre>
-<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 </div>
@@ -190,12 +207,10 @@ $(document).ready(function () {
 <h1>Read Data</h1>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucmF3RGF0YSA8LSByZWFkLmNzdignYzovdXNlcnMvYXJkYXNoL2dvb2dsZSBkcml2ZS9kYXRhL2VkdWNhdGlvbi9jb3Vyc2VyYSBtbC9jYXJldC9wbWwtdHJhaW5pbmcuY3N2JylcblxuIyBwY2EgPC0gcHJlUHJvY2VzcyhyYXdEYXRhWyxuYW1lcyhyYXdEYXRhKSE9J2NsYXNzZSddKVxuIyBwY2Ekc3RkW29yZGVyKHBjYSRzdGQsZGVjcmVhc2luZz1UKV1cblxuYGBgIn0= -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucmF3RGF0YSA8LSByZWFkLmNzdignYzovdXNlcnMvYXJkYXNoL2dvb2dsZSBkcml2ZS9kYXRhL2VkdWNhdGlvbi9jb3Vyc2VyYSBtbC9jYXJldC9wbWwtdHJhaW5pbmcuY3N2JylcbiMgcGNhIDwtIHByZVByb2Nlc3MocmF3RGF0YVssbmFtZXMocmF3RGF0YSkhPSdjbGFzc2UnXSlcbiMgcGNhJHN0ZFtvcmRlcihwY2Ekc3RkLGRlY3JlYXNpbmc9VCldXG5gYGAifQ== -->
 <pre class="r"><code>rawData &lt;- read.csv('c:/users/ardash/google drive/data/education/coursera ml/caret/pml-training.csv')
-
 # pca &lt;- preProcess(rawData[,names(rawData)!='classe'])
-# pca$std[order(pca$std,decreasing=T)]
-</code></pre>
+# pca$std[order(pca$std,decreasing=T)]</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -230,15 +245,11 @@ table(gaps)</code></pre>
 <p>There are only 53 columns with complete data. The rest are mostly blanks, NAs or DIV/0!. May not have predictive value. Store column names with gaps to remove from both training and test sets Remove gapped columns from training set</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZ2FwcGVkX25hbWVzIDwtIGFzLmxpc3Qocm93bmFtZXMoZ2Fwc1tnYXBzJG5vbl9udWxsPjE5MDAwLDBdKSlcbnByb2NEYXRhIDwtIHJhd0RhdGFbLCFjb2xuYW1lcyhyYXdEYXRhKSVpbiVnYXBwZWRfbmFtZXNdXG4jIGZlYXR1cmVDbGFzc2VzIDwtIGxhcHBseShwcm9jRGF0YSxjbGFzcylcbiMgbnVtX2ZlYXR1cmVzX2lkeCA9IHdoaWNoKGxhcHBseShwcm9jRGF0YSxjbGFzcykgJWluJSBjKFwibnVtZXJpY1wiKSlcblxuXG5cblxuIyBzdW1tYXJ5KHByb2NEYXRhKVxuYGBgIn0= -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZ2FwcGVkX25hbWVzIDwtIGFzLmxpc3Qocm93bmFtZXMoZ2Fwc1tnYXBzJG5vbl9udWxsPjE5MDAwLDBdKSlcbnByb2NEYXRhIDwtIHJhd0RhdGFbLCFjb2xuYW1lcyhyYXdEYXRhKSVpbiVnYXBwZWRfbmFtZXNdXG4jIGZlYXR1cmVDbGFzc2VzIDwtIGxhcHBseShwcm9jRGF0YSxjbGFzcylcbiMgbnVtX2ZlYXR1cmVzX2lkeCA9IHdoaWNoKGxhcHBseShwcm9jRGF0YSxjbGFzcykgJWluJSBjKFwibnVtZXJpY1wiKSlcbiMgc3VtbWFyeShwcm9jRGF0YSlcbmBgYCJ9 -->
 <pre class="r"><code>gapped_names &lt;- as.list(rownames(gaps[gaps$non_null&gt;19000,0]))
 procData &lt;- rawData[,!colnames(rawData)%in%gapped_names]
 # featureClasses &lt;- lapply(procData,class)
 # num_features_idx = which(lapply(procData,class) %in% c(&quot;numeric&quot;))
-
-
-
-
 # summary(procData)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
@@ -246,15 +257,18 @@ procData &lt;- rawData[,!colnames(rawData)%in%gapped_names]
 <p>Split to Training and Cross Validation Sets</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBjZW50U2NhbGUgPC0gcHJlUHJvY2Vzcyhwcm9jRGF0YSxtZXRob2Q9YygnY2VudGVyJywnc2NhbGUnKSlcbiMgcHJvY0RhdGEgPC0gcHJlZGljdChwcmVQcm9jLG5ld2RhdGE9cHJvY0RhdGEpXG5zZXQuc2VlZCgzNTIzKVxueU5hbWUgPC0gJ2NsYXNzZSdcbmNvbG5hbWVzKHByb2NEYXRhKVttYXRjaCh5TmFtZSxjb2xuYW1lcyhwcm9jRGF0YSkpXSA8LSAnWSdcbmluZGV4VHJhaW4gPC0gY3JlYXRlRGF0YVBhcnRpdGlvbihwcm9jRGF0YSRZLHA9Ljc1LGxpc3Q9RilcbnRyYWluU2V0IDwtIHByb2NEYXRhW2luZGV4VHJhaW4sXVxuY3Jvc3N2U2V0IDwtIHByb2NEYXRhWy1pbmRleFRyYWluLF1cbiMgcGNhIDwtIHByZVByb2Nlc3ModHJhaW5TZXRbLGNvbG5hbWVzKHRyYWluU2V0KSE9J1knXSxtZXRob2Q9J3BjYScpXG4jIHBjYSRzdGRcbiMgaSA8LSAzMFxuIyBmZWF0dXJlUGxvdCh0cmFpblNldFssaV0sdHJhaW5TZXQkWSlcbmBgYCJ9 -->
-<pre class="r"><code># centScale &lt;- preProcess(procData,method=c('center','scale'))
-# procData &lt;- predict(preProc,newdata=procData)
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBwcm9jRGF0YSA8LSBwcmVkaWN0KHByZVByb2MsbmV3ZGF0YT1wcm9jRGF0YSlcbnNldC5zZWVkKDM1MjMpXG55TmFtZSA8LSAnY2xhc3NlJ1xuY29sbmFtZXMocHJvY0RhdGEpW21hdGNoKHlOYW1lLGNvbG5hbWVzKHByb2NEYXRhKSldIDwtICdZJ1xuaW5kZXhUcmFpbiA8LSBjcmVhdGVEYXRhUGFydGl0aW9uKHByb2NEYXRhJFkscD0uNzUsbGlzdD1GKVxudHJhaW5TZXQgPC0gcHJvY0RhdGFbaW5kZXhUcmFpbixdXG5jcm9zc3ZTZXQgPC0gcHJvY0RhdGFbLWluZGV4VHJhaW4sXVxuY2VudFNjYWxlIDwtIHByZVByb2Nlc3ModHJhaW5TZXQsbWV0aG9kPWMoJ2NlbnRlcicsJ3NjYWxlJykpXG50cmFpblNldCA8LSBwcmVkaWN0KGNlbnRTY2FsZSxuZXdkYXRhPXRyYWluU2V0KVxuY3Jvc3N2U2V0IDwtIHByZWRpY3QoY2VudFNjYWxlLG5ld2RhdGE9Y3Jvc3N2U2V0KVxucHJvY0RhdGEgPC0gcHJlZGljdChjZW50U2NhbGUsbmV3ZGF0YT1wcm9jRGF0YSlcbiMgcGNhIDwtIHByZVByb2Nlc3ModHJhaW5TZXRbLGNvbG5hbWVzKHRyYWluU2V0KSE9J1knXSxtZXRob2Q9J3BjYScpXG4jIHBjYSRzdGRcbiMgaSA8LSAzMFxuIyBmZWF0dXJlUGxvdCh0cmFpblNldFssaV0sdHJhaW5TZXQkWSlcbmBgYCJ9 -->
+<pre class="r"><code># procData &lt;- predict(preProc,newdata=procData)
 set.seed(3523)
 yName &lt;- 'classe'
 colnames(procData)[match(yName,colnames(procData))] &lt;- 'Y'
 indexTrain &lt;- createDataPartition(procData$Y,p=.75,list=F)
 trainSet &lt;- procData[indexTrain,]
 crossvSet &lt;- procData[-indexTrain,]
+centScale &lt;- preProcess(trainSet,method=c('center','scale'))
+trainSet &lt;- predict(centScale,newdata=trainSet)
+crossvSet &lt;- predict(centScale,newdata=crossvSet)
+procData &lt;- predict(centScale,newdata=procData)
 # pca &lt;- preProcess(trainSet[,colnames(trainSet)!='Y'],method='pca')
 # pca$std
 # i &lt;- 30
@@ -267,81 +281,41 @@ crossvSet &lt;- procData[-indexTrain,]
 <h1>Train Model</h1>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubW9kZWxGaXRHTE0gPC0gdHJhaW4oWX4uLGRhdGE9dHJhaW5TZXQsbWV0aG9kPSdnbG0nLGZhbWlseT0nbXVsdGlub21pYWwnKVxuXG5gYGAifQ== -->
-<pre class="r"><code>modelFitGLM &lt;- train(Y~.,data=trainSet,method='glm',family='multinomial')
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHJpbnQocGFzdGUwKCdBY2N1cmFjeTogJyxyb3VuZCgxMDAqc3VtKGRpYWcoY20pKS9zdW0oY20pLDIpLCclJykpXG5cbmBgYCJ9 -->
+<pre class="r"><code>print(paste0('Accuracy: ',round(100*sum(diag(cm))/sum(cm),2),'%'))
 </code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoibW9kZWwgZml0IGZhaWxlZCBmb3IgUmVzYW1wbGUwMTogcGFyYW1ldGVyPW5vbmUgRXJyb3IgaW4gbWV0aG9kJGZpdCh4ID0geCwgeSA9IHksIHd0cyA9IHd0cywgcGFyYW0gPSB0dW5lVmFsdWUsIGxldiA9IG9ic0xldmVscywgIDogXG4gIGdsbSBtb2RlbHMgY2FuIG9ubHkgdXNlIDItY2xhc3Mgb3V0Y29tZXNcbm1vZGVsIGZpdCBmYWlsZWQgZm9yIFJlc2FtcGxlMDI6IHBhcmFtZXRlcj1ub25lIEVycm9yIGluIG1ldGhvZCRmaXQoeCA9IHgsIHkgPSB5LCB3dHMgPSB3dHMsIHBhcmFtID0gdHVuZVZhbHVlLCBsZXYgPSBvYnNMZXZlbHMsICA6IFxuICBnbG0gbW9kZWxzIGNhbiBvbmx5IHVzZSAyLWNsYXNzIG91dGNvbWVzXG5tb2RlbCBmaXQgZmFpbGVkIGZvciBSZXNhbXBsZTAzOiBwYXJhbWV0ZXI9bm9uZSBFcnJvciBpbiBtZXRob2QkZml0KHggPSB4LCB5ID0geSwgd3RzID0gd3RzLCBwYXJhbSA9IHR1bmVWYWx1ZSwgbGV2ID0gb2JzTGV2ZWxzLCAgOiBcbiAgZ2xtIG1vZGVscyBjYW4gb25seSB1c2UgMi1jbGFzcyBvdXRjb21lc1xubW9kZWwgZml0IGZhaWxlZCBmb3IgUmVzYW1wbGUwNDogcGFyYW1ldGVyPW5vbmUgRXJyb3IgaW4gbWV0aG9kJGZpdCh4ID0geCwgeSA9IHksIHd0cyA9IHd0cywgcGFyYW0gPSB0dW5lVmFsdWUsIGxldiA9IG9ic0xldmVscywgIDogXG4gIGdsbSBtb2RlbHMgY2FuIG9ubHkgdXNlIDItY2xhc3Mgb3V0Y29tZXNcbm1vZGVsIGZpdCBmYWlsZWQgZm9yIFJlc2FtcGxlMDU6IHBhcmFtZXRlcj1ub25lIEVycm9yIGluIG1ldGhvZCRmaXQoeCA9IHgsIHkgPSB5LCB3dHMgPSB3dHMsIHBhcmFtID0gdHVuZVZhbHVlLCBsZXYgPSBvYnNMZXZlbHMsICA6IFxuICBnbG0gbW9kZWxzIGNhbiBvbmx5IHVzZSAyLWNsYXNzIG91dGNvbWVzXG5tb2RlbCBmaXQgZmFpbGVkIGZvciBSZXNhbXBsZTA2OiBwYXJhbWV0ZXI9bm9uZSBFcnJvciBpbiBtZXRob2QkZml0KHggPSB4LCB5ID0geSwgd3RzID0gd3RzLCBwYXJhbSA9IHR1bmVWYWx1ZSwgbGV2ID0gb2JzTGV2ZWxzLCAgOiBcbiAgZ2xtIG1vZGVscyBjYW4gb25seSB1c2UgMi1jbGFzcyBvdXRjb21lc1xubW9kZWwgZml0IGZhaWxlZCBmb3IgUmVzYW1wbGUwNzogcGFyYW1ldGVyPW5vbmUgRXJyb3IgaW4gbWV0aG9kJGZpdCh4ID0geCwgeSA9IHksIHd0cyA9IHd0cywgcGFyYW0gPSB0dW5lVmFsdWUsIGxldiA9IG9ic0xldmVscywgIDogXG4gIGdsbSBtb2RlbHMgY2FuIG9ubHkgdXNlIDItY2xhc3Mgb3V0Y29tZXNcbm1vZGVsIGZpdCBmYWlsZWQgZm9yIFJlc2FtcGxlMDg6IHBhcmFtZXRlcj1ub25lIEVycm9yIGluIG1ldGhvZCRmaXQoeCA9IHgsIHkgPSB5LCB3dHMgPSB3dHMsIHBhcmFtID0gdHVuZVZhbHVlLCBsZXYgPSBvYnNMZXZlbHMsICA6IFxuICBnbG0gbW9kZWxzIGNhbiBvbmx5IHVzZSAyLWNsYXNzIG91dGNvbWVzXG5tb2RlbCBmaXQgZmFpbGVkIGZvciBSZXNhbXBsZTA5OiBwYXJhbWV0ZXI9bm9uZSBFcnJvciBpbiBtZXRob2QkZml0KHggPSB4LCB5ID0geSwgd3RzID0gd3RzLCBwYXJhbSA9IHR1bmVWYWx1ZSwgbGV2ID0gb2JzTGV2ZWxzLCAgOiBcbiAgZ2xtIG1vZGVscyBjYW4gb25seSB1c2UgMi1jbGFzcyBvdXRjb21lc1xubW9kZWwgZml0IGZhaWxlZCBmb3IgUmVzYW1wbGUxMDogcGFyYW1ldGVyPW5vbmUgRXJyb3IgaW4gbWV0aG9kJGZpdCh4ID0geCwgeSA9IHksIHd0cyA9IHd0cywgcGFyYW0gPSB0dW5lVmFsdWUsIGxldiA9IG9ic0xldmVscywgIDogXG4gIGdsbSBtb2RlbHMgY2FuIG9ubHkgdXNlIDItY2xhc3Mgb3V0Y29tZXNcbm1vZGVsIGZpdCBmYWlsZWQgZm9yIFJlc2FtcGxlMTE6IHBhcmFtZXRlcj1ub25lIEVycm9yIGluIG1ldGhvZCRmaXQoeCA9IHgsIHkgPSB5LCB3dHMgPSB3dHMsIHBhcmFtID0gdHVuZVZhbHVlLCBsZXYgPSBvYnNMZXZlbHMsICA6IFxuICBnbG0gbW9kZWxzIGNhbiBvbmx5IHVzZSAyLWNsYXNzIG91dGNvbWVzXG5tb2RlbCBmaXQgZmFpbGVkIGZvciBSZXNhbXBsZTEyOiBwYXJhbWV0ZXI9bm9uZSBFcnJvciBpbiBtZXRob2QkZml0KHggPSB4LCB5ID0geSwgd3RzID0gd3RzLCBwYXJhbSA9IHR1bmVWYWx1ZSwgbGV2ID0gb2JzTGV2ZWxzLCAgOiBcbiAgZ2xtIG1vZGVscyBjYW4gb25seSB1c2UgMi1jbGFzcyBvdXRjb21lc1xubW9kZWwgZml0IGZhaWxlZCBmb3IgUmVzYW1wbGUxMzogcGFyYW1ldGVyPW5vbmUgRXJyb3IgaW4gbWV0aG9kJGZpdCh4ID0geCwgeSA9IHksIHd0cyA9IHd0cywgcGFyYW0gPSB0dW5lVmFsdWUsIGxldiA9IG9ic0xldmVscywgIDogXG4gIGdsbSBtb2RlbHMgY2FuIG9ubHkgdXNlIDItY2xhc3Mgb3V0Y29tZXNcbm1vZGVsIGZpdCBmYWlsZWQgZm9yIFJlc2FtcGxlMTQ6IHBhcmFtZXRlcj1ub25lIEVycm9yIGluIG1ldGhvZCRmaXQoeCA9IHgsIHkgPSB5LCB3dHMgPSB3dHMsIHBhcmFtID0gdHVuZVZhbHVlLCBsZXYgPSBvYnNMZXZlbHMsICA6IFxuICBnbG0gbW9kZWxzIGNhbiBvbmx5IHVzZSAyLWNsYXNzIG91dGNvbWVzXG5tb2RlbCBmaXQgZmFpbGVkIGZvciBSZXNhbXBsZTE1OiBwYXJhbWV0ZXI9bm9uZSBFcnJvciBpbiBtZXRob2QkZml0KHggPSB4LCB5ID0geSwgd3RzID0gd3RzLCBwYXJhbSA9IHR1bmVWYWx1ZSwgbGV2ID0gb2JzTGV2ZWxzLCAgOiBcbiAgZ2xtIG1vZGVscyBjYW4gb25seSB1c2UgMi1jbGFzcyBvdXRjb21lc1xubW9kZWwgZml0IGZhaWxlZCBmb3IgUmVzYW1wbGUxNjogcGFyYW1ldGVyPW5vbmUgRXJyb3IgaW4gbWV0aG9kJGZpdCh4ID0geCwgeSA9IHksIHd0cyA9IHd0cywgcGFyYW0gPSB0dW5lVmFsdWUsIGxldiA9IG9ic0xldmVscywgIDogXG4gIGdsbSBtb2RlbHMgY2FuIG9ubHkgdXNlIDItY2xhc3Mgb3V0Y29tZXNcbm1vZGVsIGZpdCBmYWlsZWQgZm9yIFJlc2FtcGxlMTc6IHBhcmFtZXRlcj1ub25lIEVycm9yIGluIG1ldGhvZCRmaXQoeCA9IHgsIHkgPSB5LCB3dHMgPSB3dHMsIHBhcmFtID0gdHVuZVZhbHVlLCBsZXYgPSBvYnNMZXZlbHMsICA6IFxuICBnbG0gbW9kZWxzIGNhbiBvbmx5IHVzZSAyLWNsYXNzIG91dGNvbWVzXG5tb2RlbCBmaXQgZmFpbGVkIGZvciBSZXNhbXBsZTE4OiBwYXJhbWV0ZXI9bm9uZSBFcnJvciBpbiBtZXRob2QkZml0KHggPSB4LCB5ID0geSwgd3RzID0gd3RzLCBwYXJhbSA9IHR1bmVWYWx1ZSwgbGV2ID0gb2JzTGV2ZWxzLCAgOiBcbiAgZ2xtIG1vZGVscyBjYW4gb25seSB1c2UgMi1jbGFzcyBvdXRjb21lc1xubW9kZWwgZml0IGZhaWxlZCBmb3IgUmVzYW1wbGUxOTogcGFyYW1ldGVyPW5vbmUgRXJyb3IgaW4gbWV0aG9kJGZpdCh4ID0geCwgeSA9IHksIHd0cyA9IHd0cywgcGFyYW0gPSB0dW5lVmFsdWUsIGxldiA9IG9ic0xldmVscywgIDogXG4gIGdsbSBtb2RlbHMgY2FuIG9ubHkgdXNlIDItY2xhc3Mgb3V0Y29tZXNcbm1vZGVsIGZpdCBmYWlsZWQgZm9yIFJlc2FtcGxlMjA6IHBhcmFtZXRlcj1ub25lIEVycm9yIGluIG1ldGhvZCRmaXQoeCA9IHgsIHkgPSB5LCB3dHMgPSB3dHMsIHBhcmFtID0gdHVuZVZhbHVlLCBsZXYgPSBvYnNMZXZlbHMsICA6IFxuICBnbG0gbW9kZWxzIGNhbiBvbmx5IHVzZSAyLWNsYXNzIG91dGNvbWVzXG5tb2RlbCBmaXQgZmFpbGVkIGZvciBSZXNhbXBsZTIxOiBwYXJhbWV0ZXI9bm9uZSBFcnJvciBpbiBtZXRob2QkZml0KHggPSB4LCB5ID0geSwgd3RzID0gd3RzLCBwYXJhbSA9IHR1bmVWYWx1ZSwgbGV2ID0gb2JzTGV2ZWxzLCAgOiBcbiAgZ2xtIG1vZGVscyBjYW4gb25seSB1c2UgMi1jbGFzcyBvdXRjb21lc1xubW9kZWwgZml0IGZhaWxlZCBmb3IgUmVzYW1wbGUyMjogcGFyYW1ldGVyPW5vbmUgRXJyb3IgaW4gbWV0aG9kJGZpdCh4ID0geCwgeSA9IHksIHd0cyA9IHd0cywgcGFyYW0gPSB0dW5lVmFsdWUsIGxldiA9IG9ic0xldmVscywgIDogXG4gIGdsbSBtb2RlbHMgY2FuIG9ubHkgdXNlIDItY2xhc3Mgb3V0Y29tZXNcbm1vZGVsIGZpdCBmYWlsZWQgZm9yIFJlc2FtcGxlMjM6IHBhcmFtZXRlcj1ub25lIEVycm9yIGluIG1ldGhvZCRmaXQoeCA9IHgsIHkgPSB5LCB3dHMgPSB3dHMsIHBhcmFtID0gdHVuZVZhbHVlLCBsZXYgPSBvYnNMZXZlbHMsICA6IFxuICBnbG0gbW9kZWxzIGNhbiBvbmx5IHVzZSAyLWNsYXNzIG91dGNvbWVzXG5tb2RlbCBmaXQgZmFpbGVkIGZvciBSZXNhbXBsZTI0OiBwYXJhbWV0ZXI9bm9uZSBFcnJvciBpbiBtZXRob2QkZml0KHggPSB4LCB5ID0geSwgd3RzID0gd3RzLCBwYXJhbSA9IHR1bmVWYWx1ZSwgbGV2ID0gb2JzTGV2ZWxzLCAgOiBcbiAgZ2xtIG1vZGVscyBjYW4gb25seSB1c2UgMi1jbGFzcyBvdXRjb21lc1xubW9kZWwgZml0IGZhaWxlZCBmb3IgUmVzYW1wbGUyNTogcGFyYW1ldGVyPW5vbmUgRXJyb3IgaW4gbWV0aG9kJGZpdCh4ID0geCwgeSA9IHksIHd0cyA9IHd0cywgcGFyYW0gPSB0dW5lVmFsdWUsIGxldiA9IG9ic0xldmVscywgIDogXG4gIGdsbSBtb2RlbHMgY2FuIG9ubHkgdXNlIDItY2xhc3Mgb3V0Y29tZXNcblRoZXJlIHdlcmUgbWlzc2luZyB2YWx1ZXMgaW4gcmVzYW1wbGVkIHBlcmZvcm1hbmNlIG1lYXN1cmVzLlxuIn0= -->
-<pre><code>model fit failed for Resample01: parameter=none Error in method$fit(x = x, y = y, wts = wts, param = tuneValue, lev = obsLevels,  : 
-  glm models can only use 2-class outcomes
-model fit failed for Resample02: parameter=none Error in method$fit(x = x, y = y, wts = wts, param = tuneValue, lev = obsLevels,  : 
-  glm models can only use 2-class outcomes
-model fit failed for Resample03: parameter=none Error in method$fit(x = x, y = y, wts = wts, param = tuneValue, lev = obsLevels,  : 
-  glm models can only use 2-class outcomes
-model fit failed for Resample04: parameter=none Error in method$fit(x = x, y = y, wts = wts, param = tuneValue, lev = obsLevels,  : 
-  glm models can only use 2-class outcomes
-model fit failed for Resample05: parameter=none Error in method$fit(x = x, y = y, wts = wts, param = tuneValue, lev = obsLevels,  : 
-  glm models can only use 2-class outcomes
-model fit failed for Resample06: parameter=none Error in method$fit(x = x, y = y, wts = wts, param = tuneValue, lev = obsLevels,  : 
-  glm models can only use 2-class outcomes
-model fit failed for Resample07: parameter=none Error in method$fit(x = x, y = y, wts = wts, param = tuneValue, lev = obsLevels,  : 
-  glm models can only use 2-class outcomes
-model fit failed for Resample08: parameter=none Error in method$fit(x = x, y = y, wts = wts, param = tuneValue, lev = obsLevels,  : 
-  glm models can only use 2-class outcomes
-model fit failed for Resample09: parameter=none Error in method$fit(x = x, y = y, wts = wts, param = tuneValue, lev = obsLevels,  : 
-  glm models can only use 2-class outcomes
-model fit failed for Resample10: parameter=none Error in method$fit(x = x, y = y, wts = wts, param = tuneValue, lev = obsLevels,  : 
-  glm models can only use 2-class outcomes
-model fit failed for Resample11: parameter=none Error in method$fit(x = x, y = y, wts = wts, param = tuneValue, lev = obsLevels,  : 
-  glm models can only use 2-class outcomes
-model fit failed for Resample12: parameter=none Error in method$fit(x = x, y = y, wts = wts, param = tuneValue, lev = obsLevels,  : 
-  glm models can only use 2-class outcomes
-model fit failed for Resample13: parameter=none Error in method$fit(x = x, y = y, wts = wts, param = tuneValue, lev = obsLevels,  : 
-  glm models can only use 2-class outcomes
-model fit failed for Resample14: parameter=none Error in method$fit(x = x, y = y, wts = wts, param = tuneValue, lev = obsLevels,  : 
-  glm models can only use 2-class outcomes
-model fit failed for Resample15: parameter=none Error in method$fit(x = x, y = y, wts = wts, param = tuneValue, lev = obsLevels,  : 
-  glm models can only use 2-class outcomes
-model fit failed for Resample16: parameter=none Error in method$fit(x = x, y = y, wts = wts, param = tuneValue, lev = obsLevels,  : 
-  glm models can only use 2-class outcomes
-model fit failed for Resample17: parameter=none Error in method$fit(x = x, y = y, wts = wts, param = tuneValue, lev = obsLevels,  : 
-  glm models can only use 2-class outcomes
-model fit failed for Resample18: parameter=none Error in method$fit(x = x, y = y, wts = wts, param = tuneValue, lev = obsLevels,  : 
-  glm models can only use 2-class outcomes
-model fit failed for Resample19: parameter=none Error in method$fit(x = x, y = y, wts = wts, param = tuneValue, lev = obsLevels,  : 
-  glm models can only use 2-class outcomes
-model fit failed for Resample20: parameter=none Error in method$fit(x = x, y = y, wts = wts, param = tuneValue, lev = obsLevels,  : 
-  glm models can only use 2-class outcomes
-model fit failed for Resample21: parameter=none Error in method$fit(x = x, y = y, wts = wts, param = tuneValue, lev = obsLevels,  : 
-  glm models can only use 2-class outcomes
-model fit failed for Resample22: parameter=none Error in method$fit(x = x, y = y, wts = wts, param = tuneValue, lev = obsLevels,  : 
-  glm models can only use 2-class outcomes
-model fit failed for Resample23: parameter=none Error in method$fit(x = x, y = y, wts = wts, param = tuneValue, lev = obsLevels,  : 
-  glm models can only use 2-class outcomes
-model fit failed for Resample24: parameter=none Error in method$fit(x = x, y = y, wts = wts, param = tuneValue, lev = obsLevels,  : 
-  glm models can only use 2-class outcomes
-model fit failed for Resample25: parameter=none Error in method$fit(x = x, y = y, wts = wts, param = tuneValue, lev = obsLevels,  : 
-  glm models can only use 2-class outcomes
-There were missing values in resampled performance measures.</code></pre>
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwiQWNjdXJhY3k6IDk5LjY1JVwiXG4ifQ== -->
+<pre><code>[1] &quot;Accuracy: 99.65%&quot;</code></pre>
 <!-- rnb-output-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiU29tZXRoaW5nIGlzIHdyb25nOyBhbGwgdGhlIEFjY3VyYWN5IG1ldHJpYyB2YWx1ZXMgYXJlIG1pc3Npbmc6XG4gICAgQWNjdXJhY3kgICAgICAgS2FwcGEgICAgXG4gTWluLiAgIDogTkEgICBNaW4uICAgOiBOQSAgXG4gMXN0IFF1LjogTkEgICAxc3QgUXUuOiBOQSAgXG4gTWVkaWFuIDogTkEgICBNZWRpYW4gOiBOQSAgXG4gTWVhbiAgIDpOYU4gICBNZWFuICAgOk5hTiAgXG4gM3JkIFF1LjogTkEgICAzcmQgUXUuOiBOQSAgXG4gTWF4LiAgIDogTkEgICBNYXguICAgOiBOQSAgXG4gTkEncyAgIDoxICAgICBOQSdzICAgOjEgICAgXG4ifQ== -->
-<pre><code>Something is wrong; all the Accuracy metric values are missing:
-    Accuracy       Kappa    
- Min.   : NA   Min.   : NA  
- 1st Qu.: NA   1st Qu.: NA  
- Median : NA   Median : NA  
- Mean   :NaN   Mean   :NaN  
- 3rd Qu.: NA   3rd Qu.: NA  
- Max.   : NA   Max.   : NA  
- NA's   :1     NA's   :1    </code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY21cbmBgYCJ9 -->
+<pre class="r"><code>cm</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiICAgcHJlZGljdGlvbnNcbiAgICAgICBBICAgIEIgICAgQyAgICBEICAgIEVcbiAgQSAxMzkzICAgIDIgICAgMCAgICAwICAgIDBcbiAgQiAgICAzICA5NDYgICAgMCAgICAwICAgIDBcbiAgQyAgICAwICAgIDIgIDg1MiAgICAxICAgIDBcbiAgRCAgICAwICAgIDAgICAgNyAgNzk3ICAgIDBcbiAgRSAgICAwICAgIDAgICAgMCAgICAyICA4OTlcbiJ9 -->
+<pre><code>   predictions
+       A    B    C    D    E
+  A 1393    2    0    0    0
+  B    3  946    0    0    0
+  C    0    2  852    1    0
+  D    0    0    7  797    0
+  E    0    0    0    2  899</code></pre>
 <!-- rnb-output-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiRXJyb3IgaW4gdHJhaW4uZGVmYXVsdCh4LCB5LCB3ZWlnaHRzID0gdywgLi4uKSA6IFN0b3BwaW5nXG4ifQ== -->
-<pre><code>Error in train.default(x, y, weights = w, ...) : Stopping</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucm91bmQoY20vcm93U3VtcyhjbSksMilcbmBgYCJ9 -->
+<pre class="r"><code>round(cm/rowSums(cm),2)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiICAgcHJlZGljdGlvbnNcbiAgICAgICBBICAgIEIgICAgQyAgICBEICAgIEVcbiAgQSAxLjAwIDAuMDAgMC4wMCAwLjAwIDAuMDBcbiAgQiAwLjAwIDEuMDAgMC4wMCAwLjAwIDAuMDBcbiAgQyAwLjAwIDAuMDAgMS4wMCAwLjAwIDAuMDBcbiAgRCAwLjAwIDAuMDAgMC4wMSAwLjk5IDAuMDBcbiAgRSAwLjAwIDAuMDAgMC4wMCAwLjAwIDEuMDBcbiJ9 -->
+<pre><code>   predictions
+       A    B    C    D    E
+  A 1.00 0.00 0.00 0.00 0.00
+  B 0.00 1.00 0.00 0.00 0.00
+  C 0.00 0.00 1.00 0.00 0.00
+  D 0.00 0.00 0.01 0.99 0.00
+  E 0.00 0.00 0.00 0.00 1.00</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 </div>
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogIkNvdXJzZXJhIFByYWN0aWNhbCBNYWNoaW5lIExlYXJuaW5nIg0Kb3V0cHV0OiBodG1sX25vdGVib29rDQotLS0NCg0KI0luaXRpYWxpemUNCmBgYHtyfQ0Kcm0obGlzdD1scygpKQ0KbGlicmFyeShjYVRvb2xzKQ0KbGlicmFyeShMaWJsaW5lYVIpDQpsaWJyYXJ5KGNhcmV0KQ0KbGlicmFyeShrZXJubGFiKQ0KbGlicmFyeShDNTApDQpsaWJyYXJ5KElTTFIpDQpsaWJyYXJ5KGdncGxvdDIpDQpsaWJyYXJ5KEhtaXNjKQ0KbGlicmFyeShncmlkRXh0cmEpDQpsaWJyYXJ5KG5uZXQpDQpsaWJyYXJ5KHNwbGluZXMpDQpsaWJyYXJ5KEFwcGxpZWRQcmVkaWN0aXZlTW9kZWxpbmcpDQpsaWJyYXJ5KHJhdHRsZSkNCmxpYnJhcnkoRWxlbVN0YXRMZWFybikNCmxpYnJhcnkocGdtbSkNCmxpYnJhcnkobHVicmlkYXRlKQ0KbGlicmFyeShlbGFzdGljbmV0KQ0KbGlicmFyeShmb3JlY2FzdCkNCmxpYnJhcnkoZTEwNzEpDQpsaWJyYXJ5KExvZ2ljUmVnKQ0KYGBgDQoNCiNSZWFkIERhdGENCg0KYGBge3J9DQpyYXdEYXRhIDwtIHJlYWQuY3N2KCdjOi91c2Vycy9hcmRhc2gvZ29vZ2xlIGRyaXZlL2RhdGEvZWR1Y2F0aW9uL2NvdXJzZXJhIG1sL2NhcmV0L3BtbC10cmFpbmluZy5jc3YnKQ0KDQojIHBjYSA8LSBwcmVQcm9jZXNzKHJhd0RhdGFbLG5hbWVzKHJhd0RhdGEpIT0nY2xhc3NlJ10pDQojIHBjYSRzdGRbb3JkZXIocGNhJHN0ZCxkZWNyZWFzaW5nPVQpXQ0KDQpgYGANCg0KDQojQ2xlYW4gYW5kIFByZS1Qcm9jZXNzIERhdGENClJlbW92ZSBjb2x1bW5zIGJlbGlldmVkIHRvIGJlIHVubmVjZXNzYXJ5ICh0aW1lc3RhbXAsIHJvdyBuYW1lcykNCmBgYHtyfQ0KcmF3RGF0YSA8LSByYXdEYXRhWywtYygxOjcpXQ0KYGBgDQpGaW5kIGdhcHMgaW4gZGF0YSAoYSBsb3Qgb2YgbWlzc2luZyB2YWx1ZXMpDQpgYGB7cn0NCmdhcHMgPC0gZGF0YS5mcmFtZShjb2xTdW1zKDEqKHJhd0RhdGE9PScnIHwgaXMubmEocmF3RGF0YSkgfCByYXdEYXRhPT0nI0RJVi8wIScpKSkNCmNvbG5hbWVzKGdhcHMpIDwtICdub25fbnVsbCcNCnRhYmxlKGdhcHMpDQoNCmBgYA0KVGhlcmUgYXJlIG9ubHkgNTMgY29sdW1ucyB3aXRoIGNvbXBsZXRlIGRhdGEuICBUaGUgcmVzdCBhcmUgbW9zdGx5IGJsYW5rcywgTkFzIG9yIERJVi8wIS4gIE1heSBub3QgaGF2ZSBwcmVkaWN0aXZlIHZhbHVlLg0KU3RvcmUgY29sdW1uIG5hbWVzIHdpdGggZ2FwcyB0byByZW1vdmUgZnJvbSBib3RoIHRyYWluaW5nIGFuZCB0ZXN0IHNldHMNClJlbW92ZSBnYXBwZWQgY29sdW1ucyBmcm9tIHRyYWluaW5nIHNldA0KYGBge3J9DQpnYXBwZWRfbmFtZXMgPC0gYXMubGlzdChyb3duYW1lcyhnYXBzW2dhcHMkbm9uX251bGw+MTkwMDAsMF0pKQ0KcHJvY0RhdGEgPC0gcmF3RGF0YVssIWNvbG5hbWVzKHJhd0RhdGEpJWluJWdhcHBlZF9uYW1lc10NCiMgZmVhdHVyZUNsYXNzZXMgPC0gbGFwcGx5KHByb2NEYXRhLGNsYXNzKQ0KIyBudW1fZmVhdHVyZXNfaWR4ID0gd2hpY2gobGFwcGx5KHByb2NEYXRhLGNsYXNzKSAlaW4lIGMoIm51bWVyaWMiKSkNCg0KDQoNCg0KIyBzdW1tYXJ5KHByb2NEYXRhKQ0KYGBgDQpTcGxpdCB0byBUcmFpbmluZyBhbmQgQ3Jvc3MgVmFsaWRhdGlvbiBTZXRzDQpgYGB7cn0NCg0KIyBwcm9jRGF0YSA8LSBwcmVkaWN0KHByZVByb2MsbmV3ZGF0YT1wcm9jRGF0YSkNCnNldC5zZWVkKDM1MjMpDQp5TmFtZSA8LSAnY2xhc3NlJw0KY29sbmFtZXMocHJvY0RhdGEpW21hdGNoKHlOYW1lLGNvbG5hbWVzKHByb2NEYXRhKSldIDwtICdZJw0KaW5kZXhUcmFpbiA8LSBjcmVhdGVEYXRhUGFydGl0aW9uKHByb2NEYXRhJFkscD0uNzUsbGlzdD1GKQ0KdHJhaW5TZXQgPC0gcHJvY0RhdGFbaW5kZXhUcmFpbixdDQpjcm9zc3ZTZXQgPC0gcHJvY0RhdGFbLWluZGV4VHJhaW4sXQ0KDQpjZW50U2NhbGUgPC0gcHJlUHJvY2Vzcyh0cmFpblNldCxtZXRob2Q9YygnY2VudGVyJywnc2NhbGUnKSkNCnRyYWluU2V0IDwtIHByZWRpY3QoY2VudFNjYWxlLG5ld2RhdGE9dHJhaW5TZXQpDQpjcm9zc3ZTZXQgPC0gcHJlZGljdChjZW50U2NhbGUsbmV3ZGF0YT1jcm9zc3ZTZXQpDQpwcm9jRGF0YSA8LSBwcmVkaWN0KGNlbnRTY2FsZSxuZXdkYXRhPXByb2NEYXRhKQ0KDQojIHBjYSA8LSBwcmVQcm9jZXNzKHRyYWluU2V0Wyxjb2xuYW1lcyh0cmFpblNldCkhPSdZJ10sbWV0aG9kPSdwY2EnKQ0KIyBwY2Ekc3RkDQoNCg0KIyBpIDwtIDMwDQojIGZlYXR1cmVQbG90KHRyYWluU2V0WyxpXSx0cmFpblNldCRZKQ0KDQoNCmBgYA0KDQoNCg0KDQojVHJhaW4gTW9kZWwNCmBgYHtyfQ0KIyBnbG0sIG5uZXQsIHJwYXJ0LCByZiwgZ2JtLCBsZGENCm1vZGVsRml0UkYgPC0gdHJhaW4oWX4uLGRhdGE9dHJhaW5TZXQsbWV0aG9kPSdyZicscHJveD1UKQ0KbW9kZWxGaXRSTFIgPC0gdHJhaW4oWX4uLGRhdGE9dHJhaW5TZXQsbWV0aG9kPSdMb2dpdEJvb3N0JykNCm1vZGVsRml0TERBIDwtIHRyYWluKFl+LixkYXRhPXRyYWluU2V0LG1ldGhvZD0nbGRhJykNCg0KbW9kZWxGaXRSUEFSVCA8LSB0cmFpbihZfi4sZGF0YT10cmFpblNldCxtZXRob2Q9J3JwYXJ0JykNCm1vZGVsRml0R0xNIDwtIHRyYWluKFl+LixkYXRhPXRyYWluU2V0LG1ldGhvZD0nZ2xtJyxmYW1pbHk9J211bHRpbm9taWFsJykNCg0KbW9kZWxGaXROTkVUIDwtIHRyYWluKFl+LixkYXRhPXRyYWluU2V0LG1ldGhvZD0nbm5ldCcpDQoNCm1vZGVsRml0R0JNIDwtIHRyYWluKFl+LixkYXRhPXRyYWluU2V0LG1ldGhvZD0nZ2JtJyx2ZXJib3NlPUZBTFNFKQ0KDQoNCg0KbW9kZWxGaXRMREENCm1vZGVsRml0UlBBUlQNCm1vZGVsRml0R0JNDQptb2RlbEZpdE5ORVQNCg0KDQpnZXRUcmVlKG1vZGVsRml0UlBBUlQkZmluYWxNb2RlbCxrPTIpDQoNCm1vZGVsRml0X3N0YWNrIDwtIHRyYWluKFl+LixkYXRhPXRlbXAsbWV0aG9kPSdyZicscHJveD1UKQ0KbW9kZWxGaXQgPC0gc3ZtKFl+LixkYXRhPXRyYWluU2V0KQ0KbW9kZWxGaXQkY29lZnMNCg0KcHJlZGljdGlvbnMgPC0gcHJlZGljdChtb2RlbEZpdExEQSxuZXdkYXRhPWNyb3NzdlNldCkNCnByZWRpY3Rpb25zIDwtIHByZWRpY3QobW9kZWxGaXRSUEFSVCxuZXdkYXRhPXRyYWluU2V0KQ0KDQpjbSA8LSB0KHRhYmxlKHByZWRpY3Rpb25zLGNyb3NzdlNldCRZKSkNCmNtIDwtIHQodGFibGUocHJlZGljdGlvbnMsdHJhaW5TZXQkWSkpDQpyb3VuZChjbS9yb3dTdW1zKGNtKSwyKQ0KDQpjb25mdXNpb25NYXRyaXgocHJlZGljdGlvbnMsY3Jvc3N2U2V0JFkpLw0KDQpjb25mdXNpb25NYXRyaXgocHJlZGljdGlvbnNSRix0ZXN0U2V0JFkpDQpjb25mdXNpb25NYXRyaXgocHJlZGljdGlvbnNHQk0sdGVzdFNldCRZKQ0KY29uZnVzaW9uTWF0cml4KHByZWRpY3Rpb25zU3RhY2ssdGVzdFNldCRZKQ0KY29uZnVzaW9uTWF0cml4KHJvdW5kKHByZWRpY3Rpb25zKSx0cmFpblNldCRZKQ0KDQoNCmNvbmZ1c2lvbk1hdHJpeCh0ZW1wJFJGLHRlbXAkWSkNCg0KdGFibGUocHJlZGljdGlvbnMsdGVzdFNldCRZKQ0KDQoNCg0KDQoNCg0KDQpgYGA=</div>
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIkNvdXJzZXJhIFByYWN0aWNhbCBNYWNoaW5lIExlYXJuaW5nIg0Kb3V0cHV0OiBodG1sX25vdGVib29rDQotLS0NCg0KI0luaXRpYWxpemUNCmBgYHtyfQ0Kcm0obGlzdD1scygpKQ0KbGlicmFyeShjYVRvb2xzKQ0KbGlicmFyeShMaWJsaW5lYVIpDQpsaWJyYXJ5KGNhcmV0KQ0KbGlicmFyeShrZXJubGFiKQ0KbGlicmFyeShDNTApDQpsaWJyYXJ5KElTTFIpDQpsaWJyYXJ5KGdncGxvdDIpDQpsaWJyYXJ5KEhtaXNjKQ0KbGlicmFyeShncmlkRXh0cmEpDQpsaWJyYXJ5KG5uZXQpDQpsaWJyYXJ5KHNwbGluZXMpDQpsaWJyYXJ5KEFwcGxpZWRQcmVkaWN0aXZlTW9kZWxpbmcpDQpsaWJyYXJ5KHJhdHRsZSkNCmxpYnJhcnkoRWxlbVN0YXRMZWFybikNCmxpYnJhcnkocGdtbSkNCmxpYnJhcnkobHVicmlkYXRlKQ0KbGlicmFyeShlbGFzdGljbmV0KQ0KbGlicmFyeShmb3JlY2FzdCkNCmxpYnJhcnkoZTEwNzEpDQpsaWJyYXJ5KExvZ2ljUmVnKQ0KbGlicmFyeShyYW5kb21Gb3Jlc3QpDQpgYGANCg0KI1JlYWQgRGF0YQ0KDQpgYGB7cn0NCnJhd0RhdGEgPC0gcmVhZC5jc3YoJ2M6L3VzZXJzL2FyZGFzaC9nb29nbGUgZHJpdmUvZGF0YS9lZHVjYXRpb24vY291cnNlcmEgbWwvY2FyZXQvcG1sLXRyYWluaW5nLmNzdicpDQoNCiMgcGNhIDwtIHByZVByb2Nlc3MocmF3RGF0YVssbmFtZXMocmF3RGF0YSkhPSdjbGFzc2UnXSkNCiMgcGNhJHN0ZFtvcmRlcihwY2Ekc3RkLGRlY3JlYXNpbmc9VCldDQoNCmBgYA0KDQoNCiNDbGVhbiBhbmQgUHJlLVByb2Nlc3MgRGF0YQ0KUmVtb3ZlIGNvbHVtbnMgYmVsaWV2ZWQgdG8gYmUgdW5uZWNlc3NhcnkgKHRpbWVzdGFtcCwgcm93IG5hbWVzKQ0KYGBge3J9DQpyYXdEYXRhIDwtIHJhd0RhdGFbLC1jKDE6NyldDQpgYGANCkZpbmQgZ2FwcyBpbiBkYXRhIChhIGxvdCBvZiBtaXNzaW5nIHZhbHVlcykNCmBgYHtyfQ0KZ2FwcyA8LSBkYXRhLmZyYW1lKGNvbFN1bXMoMSoocmF3RGF0YT09JycgfCBpcy5uYShyYXdEYXRhKSB8IHJhd0RhdGE9PScjRElWLzAhJykpKQ0KY29sbmFtZXMoZ2FwcykgPC0gJ25vbl9udWxsJw0KdGFibGUoZ2FwcykNCg0KYGBgDQpUaGVyZSBhcmUgb25seSA1MyBjb2x1bW5zIHdpdGggY29tcGxldGUgZGF0YS4gIFRoZSByZXN0IGFyZSBtb3N0bHkgYmxhbmtzLCBOQXMgb3IgRElWLzAhLiAgTWF5IG5vdCBoYXZlIHByZWRpY3RpdmUgdmFsdWUuDQpTdG9yZSBjb2x1bW4gbmFtZXMgd2l0aCBnYXBzIHRvIHJlbW92ZSBmcm9tIGJvdGggdHJhaW5pbmcgYW5kIHRlc3Qgc2V0cw0KUmVtb3ZlIGdhcHBlZCBjb2x1bW5zIGZyb20gdHJhaW5pbmcgc2V0DQpgYGB7cn0NCmdhcHBlZF9uYW1lcyA8LSBhcy5saXN0KHJvd25hbWVzKGdhcHNbZ2FwcyRub25fbnVsbD4xOTAwMCwwXSkpDQpwcm9jRGF0YSA8LSByYXdEYXRhWywhY29sbmFtZXMocmF3RGF0YSklaW4lZ2FwcGVkX25hbWVzXQ0KIyBmZWF0dXJlQ2xhc3NlcyA8LSBsYXBwbHkocHJvY0RhdGEsY2xhc3MpDQojIG51bV9mZWF0dXJlc19pZHggPSB3aGljaChsYXBwbHkocHJvY0RhdGEsY2xhc3MpICVpbiUgYygibnVtZXJpYyIpKQ0KDQoNCg0KDQojIHN1bW1hcnkocHJvY0RhdGEpDQpgYGANClNwbGl0IHRvIFRyYWluaW5nIGFuZCBDcm9zcyBWYWxpZGF0aW9uIFNldHMNCmBgYHtyfQ0KDQojIHByb2NEYXRhIDwtIHByZWRpY3QocHJlUHJvYyxuZXdkYXRhPXByb2NEYXRhKQ0Kc2V0LnNlZWQoMzUyMykNCnlOYW1lIDwtICdjbGFzc2UnDQpjb2xuYW1lcyhwcm9jRGF0YSlbbWF0Y2goeU5hbWUsY29sbmFtZXMocHJvY0RhdGEpKV0gPC0gJ1knDQppbmRleFRyYWluIDwtIGNyZWF0ZURhdGFQYXJ0aXRpb24ocHJvY0RhdGEkWSxwPS43NSxsaXN0PUYpDQp0cmFpblNldCA8LSBwcm9jRGF0YVtpbmRleFRyYWluLF0NCmNyb3NzdlNldCA8LSBwcm9jRGF0YVstaW5kZXhUcmFpbixdDQoNCmNlbnRTY2FsZSA8LSBwcmVQcm9jZXNzKHRyYWluU2V0LG1ldGhvZD1jKCdjZW50ZXInLCdzY2FsZScpKQ0KdHJhaW5TZXQgPC0gcHJlZGljdChjZW50U2NhbGUsbmV3ZGF0YT10cmFpblNldCkNCmNyb3NzdlNldCA8LSBwcmVkaWN0KGNlbnRTY2FsZSxuZXdkYXRhPWNyb3NzdlNldCkNCnByb2NEYXRhIDwtIHByZWRpY3QoY2VudFNjYWxlLG5ld2RhdGE9cHJvY0RhdGEpDQoNCiMgcGNhIDwtIHByZVByb2Nlc3ModHJhaW5TZXRbLGNvbG5hbWVzKHRyYWluU2V0KSE9J1knXSxtZXRob2Q9J3BjYScpDQojIHBjYSRzdGQNCg0KDQojIGkgPC0gMzANCiMgZmVhdHVyZVBsb3QodHJhaW5TZXRbLGldLHRyYWluU2V0JFkpDQoNCg0KYGBgDQoNCg0KDQoNCiNUcmFpbiBNb2RlbA0KYGBge3J9DQojIGdsbSwgbm5ldCwgcnBhcnQsIHJmLCBnYm0sIGxkYQ0KbW9kZWxGaXRSRiA8LSB0cmFpbihZfi4sZGF0YT10cmFpblNldCxtZXRob2Q9J3JmJyxwcm94PVQpDQoNCm1vZGVsRml0UkYgPC0gcmFuZG9tRm9yZXN0KFl+LixkYXRhPXRyYWluU2V0LG1ldGhvZD0ncmYnKQ0KDQptb2RlbEZpdFJMUiA8LSB0cmFpbihZfi4sZGF0YT10cmFpblNldCxtZXRob2Q9J0xvZ2l0Qm9vc3QnKQ0KbW9kZWxGaXRMREEgPC0gdHJhaW4oWX4uLGRhdGE9dHJhaW5TZXQsbWV0aG9kPSdsZGEnKQ0KDQptb2RlbEZpdFJQQVJUIDwtIHRyYWluKFl+LixkYXRhPXRyYWluU2V0LG1ldGhvZD0ncnBhcnQnKQ0KbW9kZWxGaXRHTE0gPC0gdHJhaW4oWX4uLGRhdGE9dHJhaW5TZXQsbWV0aG9kPSdnbG0nLGZhbWlseT0nbXVsdGlub21pYWwnKQ0KDQptb2RlbEZpdE5ORVQgPC0gdHJhaW4oWX4uLGRhdGE9dHJhaW5TZXQsbWV0aG9kPSdubmV0JykNCg0KbW9kZWxGaXRHQk0gPC0gdHJhaW4oWX4uLGRhdGE9dHJhaW5TZXQsbWV0aG9kPSdnYm0nLHZlcmJvc2U9RkFMU0UpDQoNCg0KbW9kZWxGaXRSRg0KbW9kZWxGaXRMREENCm1vZGVsRml0UlBBUlQNCm1vZGVsRml0R0JNDQptb2RlbEZpdE5ORVQNCg0KDQpnZXRUcmVlKG1vZGVsRml0UlBBUlQkZmluYWxNb2RlbCxrPTIpDQoNCm1vZGVsRml0X3N0YWNrIDwtIHRyYWluKFl+LixkYXRhPXRlbXAsbWV0aG9kPSdyZicscHJveD1UKQ0KbW9kZWxGaXQgPC0gc3ZtKFl+LixkYXRhPXRyYWluU2V0KQ0KbW9kZWxGaXQkY29lZnMNCg0KcHJlZGljdGlvbnMgPC0gcHJlZGljdChtb2RlbEZpdFJGLG5ld2RhdGE9Y3Jvc3N2U2V0KQ0KDQpwcmVkaWN0aW9ucyA8LSBwcmVkaWN0KG1vZGVsRml0UlBBUlQsbmV3ZGF0YT10cmFpblNldCkNCg0KY20gPC0gdGFibGUoY3Jvc3N2U2V0JFkscHJlZGljdGlvbnMpDQpwcmludChwYXN0ZTAoJ0FjY3VyYWN5OiAnLHJvdW5kKDEwMCpzdW0oZGlhZyhjbSkpL3N1bShjbSksMiksJyUnKSkNCmNtDQpyb3VuZChjbS9yb3dTdW1zKGNtKSwyKQ0KDQoNCmNtIDwtIHQodGFibGUocHJlZGljdGlvbnMsdHJhaW5TZXQkWSkpDQpjb25mdXNpb25NYXRyaXgocHJlZGljdGlvbnMsY3Jvc3N2U2V0JFkpDQpjb25mdXNpb25NYXRyaXgocHJlZGljdGlvbnNSRix0ZXN0U2V0JFkpDQpjb25mdXNpb25NYXRyaXgocHJlZGljdGlvbnNHQk0sdGVzdFNldCRZKQ0KY29uZnVzaW9uTWF0cml4KHByZWRpY3Rpb25zU3RhY2ssdGVzdFNldCRZKQ0KY29uZnVzaW9uTWF0cml4KHJvdW5kKHByZWRpY3Rpb25zKSx0cmFpblNldCRZKQ0KDQoNCmNvbmZ1c2lvbk1hdHJpeCh0ZW1wJFJGLHRlbXAkWSkNCg0KdGFibGUocHJlZGljdGlvbnMsdGVzdFNldCRZKQ0KDQoNCmBgYA==</div>
 
 
 

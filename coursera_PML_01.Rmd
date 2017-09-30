@@ -26,6 +26,7 @@ library(elasticnet)
 library(forecast)
 library(e1071)
 library(LogicReg)
+library(randomForest)
 ```
 
 #Read Data
@@ -98,6 +99,9 @@ procData <- predict(centScale,newdata=procData)
 ```{r}
 # glm, nnet, rpart, rf, gbm, lda
 modelFitRF <- train(Y~.,data=trainSet,method='rf',prox=T)
+
+modelFitRF <- randomForest(Y~.,data=trainSet,method='rf')
+
 modelFitRLR <- train(Y~.,data=trainSet,method='LogitBoost')
 modelFitLDA <- train(Y~.,data=trainSet,method='lda')
 
@@ -109,7 +113,7 @@ modelFitNNET <- train(Y~.,data=trainSet,method='nnet')
 modelFitGBM <- train(Y~.,data=trainSet,method='gbm',verbose=FALSE)
 
 
-
+modelFitRF
 modelFitLDA
 modelFitRPART
 modelFitGBM
@@ -122,15 +126,18 @@ modelFit_stack <- train(Y~.,data=temp,method='rf',prox=T)
 modelFit <- svm(Y~.,data=trainSet)
 modelFit$coefs
 
-predictions <- predict(modelFitLDA,newdata=crossvSet)
+predictions <- predict(modelFitRF,newdata=crossvSet)
+
 predictions <- predict(modelFitRPART,newdata=trainSet)
 
-cm <- t(table(predictions,crossvSet$Y))
-cm <- t(table(predictions,trainSet$Y))
+cm <- table(crossvSet$Y,predictions)
+print(paste0('Accuracy: ',round(100*sum(diag(cm))/sum(cm),2),'%'))
+cm
 round(cm/rowSums(cm),2)
 
-confusionMatrix(predictions,crossvSet$Y)/
 
+cm <- t(table(predictions,trainSet$Y))
+confusionMatrix(predictions,crossvSet$Y)
 confusionMatrix(predictionsRF,testSet$Y)
 confusionMatrix(predictionsGBM,testSet$Y)
 confusionMatrix(predictionsStack,testSet$Y)
@@ -140,11 +147,6 @@ confusionMatrix(round(predictions),trainSet$Y)
 confusionMatrix(temp$RF,temp$Y)
 
 table(predictions,testSet$Y)
-
-
-
-
-
 
 
 ```
